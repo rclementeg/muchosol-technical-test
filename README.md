@@ -32,6 +32,43 @@
 $ npm install
 ```
 
+## ENV Files
+
+Create environment files .env, .prod.env, .stag.env with these env variables:
+
+- PORT
+- MONGO_INITDB_ROOT_USERNAME
+- MONGO_INITDB_ROOT_PASSWORD
+- MONGO_DB
+- MONGO_PORT
+- MONGO_HOST
+- MONGO_CONNECTION
+
+## Local Database
+
+Create docker-compose.yml file with que following structure:
+version: 'X.X'
+
+services:
+mongo:
+image: XXXXXX
+environment:
+MONGO_INITDB_ROOT_USERNAME: XXXX
+MONGO_INITDB_ROOT_PASSWORD: XXXX
+ports: - XXXXX:XXXXX
+volumes: - ./mongo_data:/data/db
+
+## Local Database
+
+```bash
+# To start docker
+$ docker-compose up -d SERVICE_NAME
+
+
+# To check if all it's ok
+$ docker-compose ps
+```
+
 ## Running the app
 
 ```bash

@@ -33,3 +33,12 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Docker file
+docker-compose.yml
+
+# Env files
+*.env
+
+# Mongo data store folder
+/mongo_data
