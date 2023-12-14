@@ -44,6 +44,14 @@ export class CreateArticleDto {
   @IsNotEmpty()
   @IsUrl()
   url: string;
+
+  @IsOptional()
+  @IsDate()
+  lastUpdate: Date;
+
+  @IsOptional()
+  @IsDate()
+  created: Date;
 }
 
 export class UpdateArticleDto extends PartialType(CreateArticleDto) {}

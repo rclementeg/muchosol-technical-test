@@ -31,6 +31,12 @@ export class Article extends Document {
 
   @Prop({ type: String })
   url: string;
+
+  @Prop({ type: Date })
+  lastUpdate: Date;
+
+  @Prop({ type: Date })
+  created: Date;
 }
 
 export const ArticleSchema = SchemaFactory.createForClass(Article);
