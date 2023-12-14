@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection, connect, Model } from 'mongoose';
+import { getModelToken } from '@nestjs/mongoose';
 
 import { ArticlesController } from './articles.controller';
-import { Connection, connect, Model } from 'mongoose';
 import { Article, ArticleSchema } from '../entities/article.entity';
 import { ArticlesService } from '../services/articles.service';
-import { getModelToken } from '@nestjs/mongoose';
 import { CreateArticleDtoStub } from '../dtos/article.dto.stub';
 import { UpdateArticleDto } from '../dtos/article.dto';
 

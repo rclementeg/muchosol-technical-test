@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Connection, connect, Model } from 'mongoose';
+import { getModelToken } from '@nestjs/mongoose';
 
 import { NewspapersController } from './newspapers.controller';
-import { Connection, connect, Model } from 'mongoose';
 import { Newspaper, NewspaperSchema } from '../entities/newspaper.entity';
 import { NewspapersService } from '../services/newspapers.service';
-import { getModelToken } from '@nestjs/mongoose';
 import { CreateNewspaperDtoStub } from '../dtos/newspaper.dto.stub';
 import { UpdateNewspaperDto } from '../dtos/newspaper.dto';
 

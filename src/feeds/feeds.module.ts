@@ -7,6 +7,8 @@ import { ArticlesController } from './controllers/articles.controller';
 import { ArticlesService } from './services/articles.service';
 import { NewspapersController } from './controllers/newspapers.controller';
 import { NewspapersService } from './services/newspapers.service';
+import { FeedsController } from './controllers/feeds.controller';
+import { FeedsService } from './services/feeds.service';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { NewspapersService } from './services/newspapers.service';
       { name: Article.name, schema: ArticleSchema },
     ]),
   ],
-  controllers: [ArticlesController, NewspapersController],
-  providers: [ArticlesService, NewspapersService],
+  controllers: [ArticlesController, NewspapersController, FeedsController],
+  providers: [ArticlesService, NewspapersService, FeedsService],
 })
 export class FeedsModule {}
