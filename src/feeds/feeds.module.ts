@@ -5,6 +5,8 @@ import { Newspaper, NewspaperSchema } from './entities/newspaper.entity';
 import { Article, ArticleSchema } from './entities/article.entity';
 import { ArticlesController } from './controllers/articles.controller';
 import { ArticlesService } from './services/articles.service';
+import { NewspapersController } from './controllers/newspapers.controller';
+import { NewspapersService } from './services/newspapers.service';
 
 @Module({
   imports: [
@@ -14,7 +16,7 @@ import { ArticlesService } from './services/articles.service';
       { name: Article.name, schema: ArticleSchema },
     ]),
   ],
-  controllers: [ArticlesController],
-  providers: [ArticlesService],
+  controllers: [ArticlesController, NewspapersController],
+  providers: [ArticlesService, NewspapersService],
 })
 export class FeedsModule {}
