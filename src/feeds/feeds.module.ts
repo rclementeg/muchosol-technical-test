@@ -3,6 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Feed, FeedSchema } from './entities/feed.entity';
 import { Newspaper, NewspaperSchema } from './entities/newspaper.entity';
 import { Article, ArticleSchema } from './entities/article.entity';
+import { ArticlesController } from './controllers/articles.controller';
+import { ArticlesService } from './services/articles.service';
 
 @Module({
   imports: [
@@ -12,7 +14,7 @@ import { Article, ArticleSchema } from './entities/article.entity';
       { name: Article.name, schema: ArticleSchema },
     ]),
   ],
-  controllers: [],
-  providers: [],
+  controllers: [ArticlesController],
+  providers: [ArticlesService],
 })
 export class FeedsModule {}
