@@ -10,11 +10,13 @@ import { environments } from './environments';
 
 import { DatabaseModule } from './database/database.module';
 import { FeedsModule } from './feeds/feeds.module';
+import { ScrapersModule } from './scrapers/scrapers.module';
 
 @Module({
   imports: [
     DatabaseModule,
     FeedsModule,
+    ScrapersModule,
     ConfigModule.forRoot({
       envFilePath: environments[process.env.NODE_ENV],
       load: [config],
