@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { CreateArticleDto } from '../../feeds/dtos/article.dto';
@@ -35,11 +35,17 @@ export class ScrapersService {
       );
     });
 
-    const result = await Promise.all(promises);
-    const articlesList = result.flat();
-    this.saveArticles(articlesList);
+    try {
+      const result = await Promise.all(promises);
+      const articlesList = result.flat();
+      this.saveArticles(articlesList);
 
-    return articlesList;
+      return articlesList;
+    } catch (error) {
+      throw new BadRequestException('Error processing scrap task', {
+        cause: error,
+      });
+    }
   }
 
   async saveArticles(articles: CreateArticleDto[]) {
