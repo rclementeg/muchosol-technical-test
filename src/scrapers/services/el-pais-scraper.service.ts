@@ -53,7 +53,6 @@ export class ElPaisScraperService {
         };
       });
     } catch (error) {
-      console.log(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     } finally {
       await browser.close();

@@ -6,17 +6,18 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { FeedsService } from '../services/feeds.service';
 import {
-  AddArticleToFeedDto,
   AddNewspaperToFeedDto,
   CreateFeedDto,
   UpdateFeedDto,
 } from '../dtos/feed.dto';
 import { MongoIdPipe } from '../../common/mongo-id/mongo-id.pipe';
+import { PaginationArticlesDto } from '../dtos/article.dto';
 
 @Controller('feeds')
 export class FeedsController {
@@ -32,6 +33,26 @@ export class FeedsController {
   @ApiOperation({ summary: 'Get a single feed by id' })
   getOne(@Param('id', MongoIdPipe) id: string) {
     return this.feedsService.findOne(id);
+  }
+
+  @Get(':id/articles')
+  @ApiOperation({
+    summary: "Get list of articles of feed's newspapers with pagination",
+  })
+  getArticles(
+    @Param('id', MongoIdPipe) id: string,
+    @Query() params: PaginationArticlesDto,
+  ) {
+    return this.feedsService.getArticles(id, params);
+  }
+
+  @Get(':id/last-articles')
+  @ApiOperation({
+    summary:
+      'Get last five articles of each newspaper included in newspapers array of feed',
+  })
+  getLastArticles(@Param('id', MongoIdPipe) id: string) {
+    return this.feedsService.getLastArticles(id);
   }
 
   @Post()
@@ -52,28 +73,12 @@ export class FeedsController {
     return this.feedsService.addNewspaper(id, payload);
   }
 
-  @Put(':id/article')
-  addArticle(
-    @Param('id', MongoIdPipe) id: string,
-    @Body() payload: AddArticleToFeedDto,
-  ) {
-    return this.feedsService.addArticle(id, payload);
-  }
-
   @Delete(':id/newspaper/:newspaperId')
   removeNewspaper(
     @Param('id', MongoIdPipe) id: string,
     @Param('newspaperId', MongoIdPipe) newspaperId: string,
   ) {
     return this.feedsService.removeNewspaper(id, newspaperId);
-  }
-
-  @Delete(':id/article/:articleId')
-  removeArticle(
-    @Param('id', MongoIdPipe) id: string,
-    @Param('articleId', MongoIdPipe) articleId: string,
-  ) {
-    return this.feedsService.removeArticle(id, articleId);
   }
 
   @Delete(':id')

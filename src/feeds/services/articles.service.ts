@@ -3,7 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Article } from '../entities/article.entity';
-import { CreateArticleDto, UpdateArticleDto } from '../dtos/article.dto';
+import {
+  CreateArticleDto,
+  PaginationArticlesDto,
+  UpdateArticleDto,
+} from '../dtos/article.dto';
 
 @Injectable()
 export class ArticlesService {
@@ -11,15 +15,45 @@ export class ArticlesService {
     @InjectModel(Article.name) private articleModel: Model<Article>,
   ) {}
 
-  findAll() {
-    return this.articleModel.find().lean();
+  async findAll(params?: PaginationArticlesDto) {
+    const { limit, offset } = params;
+    let query = this.articleModel.find().lean().sort({ created: -1 });
+
+    if (!isNaN(limit) || !isNaN(offset)) {
+      query = query.skip(offset * limit).limit(limit);
+    }
+
+    return query.exec();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     return this.articleModel.findById(id).lean();
   }
 
-  create(data: CreateArticleDto) {
+  async findByNewspaperIds(
+    newspaperIds: string[],
+    params?: PaginationArticlesDto,
+  ) {
+    const { limit, offset } = params;
+
+    let query = this.articleModel
+      .find({ newspaper: { $in: newspaperIds } })
+      .sort({ created: -1 });
+
+    if (!isNaN(limit) || !isNaN(offset)) {
+      query = query.skip(offset * limit).limit(limit);
+    }
+
+    return query.exec();
+  }
+
+  async create(data: CreateArticleDto) {
+    const article = await this.articleModel.findOne({ url: data.url });
+
+    if (article) {
+      return;
+    }
+
     try {
       data.date = data.date || new Date();
       data.created = data.created || new Date();
@@ -30,7 +64,7 @@ export class ArticlesService {
     }
   }
 
-  update(id: string, changes: UpdateArticleDto) {
+  async update(id: string, changes: UpdateArticleDto) {
     try {
       changes.lastUpdate = changes.lastUpdate || new Date();
       return this.articleModel.findByIdAndUpdate(

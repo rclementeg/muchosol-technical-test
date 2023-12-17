@@ -8,45 +8,44 @@ import { FeedsService } from '../services/feeds.service';
 import { Feed, FeedSchema } from '../entities/feed.entity';
 import { CreateFeedDtoStub } from '../dtos/feed.dto.stub';
 import { UpdateFeedDto } from '../dtos/feed.dto';
-import { CreateArticleDtoStub } from '../dtos/article.dto.stub';
-import { ArticlesController } from './articles.controller';
-import { ArticlesService } from '../services/articles.service';
-import { Article, ArticleSchema } from '../entities/article.entity';
 import { Newspaper, NewspaperSchema } from '../entities/newspaper.entity';
 import { NewspapersService } from '../services/newspapers.service';
 import { NewspapersController } from './newspapers.controller';
 import { CreateNewspaperDtoStub } from '../dtos/newspaper.dto.stub';
+import { ScrapersService } from '../../scrapers/services/scrapers.service';
+import { ScraperFactory } from '../../scrapers/factories/scraper.factory';
+import { ArticlesService } from '../services/articles.service';
+import { Article } from '../entities/article.entity';
 
 describe('FeedsController', () => {
   let feedController: FeedsController;
-  let articleController: ArticlesController;
   let newspaperController: NewspapersController;
   let mongod: MongoMemoryServer;
   let mongoConnection: Connection;
   let feedModel: Model<Feed>;
-  let articleModel: Model<Article>;
   let newspaperModel: Model<Newspaper>;
+  let articleModel: Model<Article>;
 
   beforeAll(async () => {
     mongod = await MongoMemoryServer.create();
     const uri = mongod.getUri();
     mongoConnection = (await connect(uri)).connection;
     feedModel = mongoConnection.model(Feed.name, FeedSchema);
-    articleModel = mongoConnection.model(Article.name, ArticleSchema);
     newspaperModel = mongoConnection.model(Newspaper.name, NewspaperSchema);
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [FeedsController, ArticlesController, NewspapersController],
+      controllers: [FeedsController, NewspapersController],
       providers: [
         FeedsService,
-        ArticlesService,
         NewspapersService,
+        ArticlesService,
+        ScrapersService,
+        ScraperFactory,
         { provide: getModelToken(Feed.name), useValue: feedModel },
-        { provide: getModelToken(Article.name), useValue: articleModel },
         { provide: getModelToken(Newspaper.name), useValue: newspaperModel },
+        { provide: getModelToken(Article.name), useValue: articleModel },
       ],
     }).compile();
     feedController = app.get<FeedsController>(FeedsController);
-    articleController = app.get<ArticlesController>(ArticlesController);
     newspaperController = app.get<NewspapersController>(NewspapersController);
   });
 
@@ -66,8 +65,8 @@ describe('FeedsController', () => {
 
   describe('posting a new Feed', () => {
     it('it must return the stored feed', async () => {
-      const createdArticle = await feedController.create(CreateFeedDtoStub);
-      expect(createdArticle.name).toBe(CreateFeedDtoStub.name);
+      const createdFeed = await feedController.create(CreateFeedDtoStub);
+      expect(createdFeed.name).toBe(CreateFeedDtoStub.name);
     });
   });
 
@@ -77,12 +76,12 @@ describe('FeedsController', () => {
       const createdFeed = await feedController.create(CreateFeedDtoStub);
       const updateFeedDto = new UpdateFeedDto(createdFeed);
       updateFeedDto.name = updatedName;
-      const updatedArticle = await feedController.update(
+      const updatedFeed = await feedController.update(
         createdFeed.id,
         updateFeedDto,
       );
 
-      expect(updatedArticle.name).toBe(updatedName);
+      expect(updatedFeed.name).toBe(updatedName);
     });
   });
 
@@ -93,29 +92,6 @@ describe('FeedsController', () => {
       const removedFeed = await feedController.getOne(createdFeed.id);
 
       expect(removedFeed).toBeFalsy();
-    });
-  });
-
-  describe('adding and removing an article to a feed', () => {
-    it('it must insert a new article in a feed and continue removing it', async () => {
-      const createdArticle =
-        await articleController.create(CreateArticleDtoStub);
-      const createdFeed = await feedController.create(CreateFeedDtoStub);
-      await feedController.addArticle(createdFeed.id, {
-        article: createdArticle.id,
-      });
-
-      let updatedFeed = await feedController.getOne(createdFeed.id);
-
-      expect(createdFeed.articles.length).toBeLessThan(
-        updatedFeed.articles.length,
-      );
-
-      expect(updatedFeed.articles[0].toString()).toBe(createdArticle.id);
-
-      await feedController.removeArticle(createdFeed.id, createdArticle.id);
-      updatedFeed = await feedController.getOne(createdFeed.id);
-      expect(updatedFeed.articles.length).toBe(0);
     });
   });
 
