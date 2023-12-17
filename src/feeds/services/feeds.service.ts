@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import {
@@ -19,6 +20,7 @@ import { PaginationArticlesDto } from '../dtos/article.dto';
 
 @Injectable()
 export class FeedsService {
+  private readonly logger = new Logger(FeedsService.name);
   constructor(
     @InjectModel(Feed.name) private feedModel: Model<Feed>,
     private scraperService: ScrapersService,
@@ -41,7 +43,7 @@ export class FeedsService {
     const feed = await this.feedModel.findOne({ name: data.name });
 
     if (feed) {
-      return;
+      return feed;
     }
 
     try {
@@ -49,6 +51,7 @@ export class FeedsService {
       const newFeed = new this.feedModel(data);
       return newFeed.save();
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
@@ -62,6 +65,7 @@ export class FeedsService {
         { new: true },
       );
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
@@ -70,6 +74,7 @@ export class FeedsService {
     try {
       return this.feedModel.findByIdAndDelete(id);
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
@@ -86,6 +91,7 @@ export class FeedsService {
 
       return feed;
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
@@ -107,12 +113,17 @@ export class FeedsService {
 
       return true;
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
 
   async getArticles(id: string, params: PaginationArticlesDto) {
     const feed = await this.findOne(id);
+    if (!feed) {
+      return [];
+    }
+
     const newspaperIds = feed.newspapers.map((newspaper) =>
       newspaper.toString(),
     );

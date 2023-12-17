@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { CreateArticleDto } from '../../feeds/dtos/article.dto';
@@ -9,15 +9,18 @@ import { Newspaper } from '../../feeds/entities/newspaper.entity';
 
 @Injectable()
 export class ScrapersService {
+  private readonly logger = new Logger(ScrapersService.name);
   constructor(
     private articleService: ArticlesService,
     private newspapersService: NewspapersService,
     private scraperFactory: ScraperFactory,
   ) {}
-  @Cron(CronExpression.EVERY_30_MINUTES)
+  @Cron(CronExpression.EVERY_30_MINUTES, { name: 'scraperJob' })
   async prepareScraperTask() {
+    this.logger.log('Starting Scraper task');
     const newspapers = await this.newspapersService.findAll();
     await this.scrapeNewspapers(newspapers);
+    this.logger.log('Finished Scraper task');
   }
 
   async scrapeNewspapers(newspapers: Newspaper[]) {
@@ -30,7 +33,7 @@ export class ScrapersService {
     newspapers.forEach((newspaper) => {
       promises.push(
         this.scraperFactory
-          .create(newspaper.name)
+          .create(newspaper.url)
           .run(newspaper._id.toString(), newspaper.url),
       );
     });
@@ -42,6 +45,7 @@ export class ScrapersService {
 
       return articlesList;
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Error processing scrap task', {
         cause: error,
       });

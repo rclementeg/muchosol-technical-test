@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -11,6 +11,7 @@ import {
 
 @Injectable()
 export class ArticlesService {
+  private readonly logger = new Logger(ArticlesService.name);
   constructor(
     @InjectModel(Article.name) private articleModel: Model<Article>,
   ) {}
@@ -60,6 +61,7 @@ export class ArticlesService {
       const newArticle = new this.articleModel(data);
       return newArticle.save();
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
@@ -73,6 +75,7 @@ export class ArticlesService {
         { new: true },
       );
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
@@ -81,6 +84,7 @@ export class ArticlesService {
     try {
       return this.articleModel.findByIdAndDelete(id);
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }

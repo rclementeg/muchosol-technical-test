@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -7,6 +7,7 @@ import { CreateNewspaperDto, UpdateNewspaperDto } from '../dtos/newspaper.dto';
 
 @Injectable()
 export class NewspapersService {
+  private readonly logger = new Logger(NewspapersService.name);
   constructor(
     @InjectModel(Newspaper.name) private newspaperModel: Model<Newspaper>,
   ) {}
@@ -23,7 +24,7 @@ export class NewspapersService {
     const newspaper = await this.newspaperModel.findOne({ url: data.url });
 
     if (newspaper) {
-      return;
+      return newspaper;
     }
 
     try {
@@ -31,6 +32,7 @@ export class NewspapersService {
       const newNewspaper = new this.newspaperModel(data);
       return newNewspaper.save();
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
@@ -44,6 +46,7 @@ export class NewspapersService {
         { new: true },
       );
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
@@ -52,6 +55,7 @@ export class NewspapersService {
     try {
       return this.newspaperModel.findByIdAndDelete(id);
     } catch (error) {
+      this.logger.error(error);
       throw new BadRequestException('Something bad happened', { cause: error });
     }
   }
