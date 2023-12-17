@@ -1,4 +1,4 @@
 export const newspapers = {
-  EL_PAIS: 'El País',
-  EL_MUNDO: 'El Mundo',
+  EL_PAIS: 'https://elpais.com',
+  EL_MUNDO: 'https://www.elmundo.es/',
 };

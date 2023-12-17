@@ -30,4 +30,54 @@ import { ScraperFactory } from '../scrapers/factories/scraper.factory';
     ScraperFactory,
   ],
 })
-export class FeedsModule {}
+export class FeedsModule {
+  constructor(
+    private feedsService: FeedsService,
+    private newspapersService: NewspapersService,
+  ) {}
+
+  async onModuleInit() {
+    const newspaperEP = {
+      name: 'El País',
+      description: 'Actualidad socialista',
+      category: 'Actualidad',
+      country: 'España',
+      lang: 'Español',
+      url: 'https://elpais.com',
+      created: new Date(),
+      lastUpdate: new Date(),
+    };
+
+    const newspaperEM = {
+      name: 'El Mundo',
+      description: 'Actualidad conservadora',
+      category: 'Actualidad',
+      country: 'España',
+      lang: 'Español',
+      url: 'https://www.elmundo.es/',
+      created: new Date(),
+      lastUpdate: new Date(),
+    };
+
+    const feed = {
+      name: 'Feed por defecto',
+      description: 'Este será el primer feed por defecto',
+      created: new Date(),
+      lastUpdate: new Date(),
+      newspapers: [],
+    };
+
+    const promises = [
+      this.newspapersService.create(newspaperEP),
+      this.newspapersService.create(newspaperEM),
+    ];
+
+    const results = await Promise.all(promises);
+
+    results.forEach(
+      (result) => result?._id && feed.newspapers.push(result._id),
+    );
+
+    return this.feedsService.create(feed);
+  }
+}

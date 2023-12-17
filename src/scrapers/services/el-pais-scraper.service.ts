@@ -15,7 +15,7 @@ export class ElPaisScraperService {
       });
 
       const articles = await page.$$eval(
-        'main.mw div.z section:first-child div article',
+        'main.mw div.z section:first-child article',
         (elements) => {
           const fiveArticles = elements.slice(0, 5);
 
@@ -33,7 +33,7 @@ export class ElPaisScraperService {
             return {
               title,
               subtitle,
-              author: authors.join(', '),
+              author: authors.join(', ') ? authors.join(', ') : 'EL PAIS',
               category,
               image,
               url: link,

@@ -47,7 +47,7 @@ export class ElMundoScraperService {
 
           return {
             title,
-            author,
+            author: author || 'EL MUNDO',
             category,
             image,
             url: link,
