@@ -11,15 +11,21 @@ export class NewspapersService {
     @InjectModel(Newspaper.name) private newspaperModel: Model<Newspaper>,
   ) {}
 
-  findAll() {
+  async findAll() {
     return this.newspaperModel.find().lean();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     return this.newspaperModel.findById(id).lean();
   }
 
-  create(data: CreateNewspaperDto) {
+  async create(data: CreateNewspaperDto) {
+    const newspaper = await this.newspaperModel.findOne({ url: data.url });
+
+    if (newspaper) {
+      return;
+    }
+
     try {
       data.created = data.created || new Date();
       const newNewspaper = new this.newspaperModel(data);
@@ -29,7 +35,7 @@ export class NewspapersService {
     }
   }
 
-  update(id: string, changes: UpdateNewspaperDto) {
+  async update(id: string, changes: UpdateNewspaperDto) {
     try {
       changes.lastUpdate = changes.lastUpdate || new Date();
       return this.newspaperModel.findByIdAndUpdate(

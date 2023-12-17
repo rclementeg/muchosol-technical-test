@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
   IsDate,
   IsNotEmpty,
@@ -10,34 +10,42 @@ import {
 export class CreateNewspaperDto {
   @IsNotEmpty()
   @IsString()
+  @ApiProperty()
   name: string;
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty()
   description: string;
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty()
   category: string;
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty()
   country: string;
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty()
   lang: string;
 
   @IsNotEmpty()
   @IsUrl()
+  @ApiProperty()
   url: string;
 
   @IsOptional()
   @IsDate()
+  @ApiProperty()
   lastUpdate: Date;
 
   @IsOptional()
   @IsDate()
+  @ApiProperty()
   created: Date;
 }
 

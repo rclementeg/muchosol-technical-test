@@ -4,7 +4,6 @@ export const CreateArticleDtoStub: CreateArticleDto = {
   title: 'Un nuevo comienzo',
   newspaper: '6579f37ad6438e61df832791',
   subtitle: 'La nueva esperanza',
-  content: 'Lorem ipsum',
   author: 'John Doe',
   category: 'Actualidad',
   image: 'http://image.com',

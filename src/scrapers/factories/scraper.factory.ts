@@ -1,7 +1,8 @@
-import { newspapers } from 'src/common/newspapers/newspapers';
+import { BadRequestException } from '@nestjs/common';
+
+import { newspapers } from '../../common/newspapers/newspapers';
 import { ElMundoScraperService } from '../services/el-mundo-scraper.service';
 import { ElPaisScraperService } from '../services/el-pais-scraper.service';
-import { BadRequestException } from '@nestjs/common';
 export class ScraperFactory {
   create(newspaper) {
     switch (newspaper) {

@@ -4,29 +4,46 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
-  AddArticleToFeedDto,
   AddNewspaperToFeedDto,
   CreateFeedDto,
+  FeedQueryOptions,
   UpdateFeedDto,
 } from '../dtos/feed.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Feed } from '../entities/feed.entity';
+import { ScrapersService } from '../../scrapers/services/scrapers.service';
+import { ArticlesService } from './articles.service';
+import { PaginationArticlesDto } from '../dtos/article.dto';
 
 @Injectable()
 export class FeedsService {
-  constructor(@InjectModel(Feed.name) private feedModel: Model<Feed>) {}
+  constructor(
+    @InjectModel(Feed.name) private feedModel: Model<Feed>,
+    private scraperService: ScrapersService,
+    private articlesService: ArticlesService,
+  ) {}
 
   async findAll() {
-    return this.feedModel.find().populate('newspapers').lean();
+    return this.feedModel.find().lean();
   }
 
-  findOne(id: string) {
+  async findOne(id: string, options?: FeedQueryOptions) {
+    if (options?.populateNewspapers) {
+      return this.feedModel.findById(id).populate('newspapers').lean();
+    }
+
     return this.feedModel.findById(id).lean();
   }
 
   async create(data: CreateFeedDto) {
+    const feed = await this.feedModel.findOne({ name: data.name });
+
+    if (feed) {
+      return;
+    }
+
     try {
       data.created = data.created || new Date();
       const newFeed = new this.feedModel(data);
@@ -94,40 +111,22 @@ export class FeedsService {
     }
   }
 
-  async removeArticle(id: string, articleId: string) {
-    try {
-      const feed = await this.feedModel.findByIdAndUpdate(
-        id,
-        {
-          $pull: { articles: articleId },
-        },
-        { new: true },
-      );
+  async getArticles(id: string, params: PaginationArticlesDto) {
+    const feed = await this.findOne(id);
+    const newspaperIds = feed.newspapers.map((newspaper) =>
+      newspaper.toString(),
+    );
 
-      return feed;
-    } catch (error) {
-      throw new BadRequestException('Something bad happened', { cause: error });
-    }
+    return this.articlesService.findByNewspaperIds(newspaperIds, params);
   }
 
-  async addArticle(id: string, data: AddArticleToFeedDto) {
-    try {
-      const result = await this.feedModel.updateOne(
-        { _id: id, articles: { $nin: [data.article] } },
-        {
-          $push: { articles: data.article },
-        },
-      );
+  async getLastArticles(id: string) {
+    const feed = await this.findOne(id, { populateNewspapers: true });
 
-      if (result.modifiedCount === 0) {
-        throw new NotFoundException(
-          `Not found a feed with id: ${id} that doesn't include this article ${data.article}`,
-        );
-      }
-
-      return true;
-    } catch (error) {
-      throw new BadRequestException('Something bad happened', { cause: error });
+    if (!feed.newspapers?.length) {
+      return [];
     }
+
+    return this.scraperService.scrapeNewspapers(feed.newspapers);
   }
 }

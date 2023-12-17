@@ -11,11 +11,8 @@ export class Article extends Document {
   @Prop({ type: SchemaTypes.ObjectId, ref: 'Customer', required: true })
   newspaper: Newspaper | Types.ObjectId;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   subtitle: string;
-
-  @Prop({ type: String, required: true })
-  content: string;
 
   @Prop({ type: String, required: true })
   date: Date;
@@ -23,7 +20,7 @@ export class Article extends Document {
   @Prop({ type: String, required: true })
   author: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   category: string;
 
   @Prop({ type: String })

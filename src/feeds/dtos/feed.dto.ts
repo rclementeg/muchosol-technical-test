@@ -4,47 +4,51 @@ import {
   IsArray,
   IsOptional,
   IsString,
+  IsBoolean,
 } from 'class-validator';
-import { OmitType, PartialType } from '@nestjs/swagger';
+import { OmitType, PartialType, ApiProperty } from '@nestjs/swagger';
 
 export class CreateFeedDto {
   @IsNotEmpty()
   @IsString()
+  @ApiProperty()
   name: string;
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty()
   description: string;
 
   @IsOptional()
   @IsArray()
+  @ApiProperty()
   newspapers: string[];
 
   @IsOptional()
-  @IsArray()
-  articles: string[];
-
-  @IsOptional()
   @IsDate()
+  @ApiProperty()
   lastUpdate: Date;
 
   @IsOptional()
   @IsDate()
+  @ApiProperty()
   created: Date;
 }
 
 export class UpdateFeedDto extends PartialType(
-  OmitType(CreateFeedDto, ['articles', 'newspapers']),
+  OmitType(CreateFeedDto, ['newspapers']),
 ) {}
-
-export class AddArticleToFeedDto {
-  @IsNotEmpty()
-  @IsString()
-  readonly article: string;
-}
 
 export class AddNewspaperToFeedDto {
   @IsNotEmpty()
   @IsString()
+  @ApiProperty()
   readonly newspaper: string;
+}
+
+export class FeedQueryOptions {
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty()
+  populateNewspapers: boolean;
 }

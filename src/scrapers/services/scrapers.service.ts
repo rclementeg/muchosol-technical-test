@@ -5,7 +5,7 @@ import { CreateArticleDto } from '../../feeds/dtos/article.dto';
 import { ArticlesService } from '../../feeds/services/articles.service';
 import { NewspapersService } from '../../feeds/services/newspapers.service';
 import { ScraperFactory } from '../factories/scraper.factory';
-import { Newspaper } from 'src/feeds/entities/newspaper.entity';
+import { Newspaper } from '../../feeds/entities/newspaper.entity';
 
 @Injectable()
 export class ScrapersService {
